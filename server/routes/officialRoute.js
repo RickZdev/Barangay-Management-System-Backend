@@ -5,6 +5,7 @@ const {
   createOfficial,
   deleteOfficial,
   updateOfficial,
+  searchOfficials,
 } = require("../controllers/officialController");
 
 // const requireAuth = require("../middleware/requireAuth");
@@ -23,5 +24,7 @@ router.post("/", createOfficial);
 router.delete("/:id", deleteOfficial);
 
 router.patch("/:position", updateOfficial);
+
+router.get("/search/:value", searchOfficials);
 
 module.exports = router;

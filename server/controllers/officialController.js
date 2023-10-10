@@ -67,10 +67,31 @@ const updateOfficial = async (req, res) => {
   }
 };
 
+const searchOfficials = async (req, res) => {
+  const { value } = req.params;
+
+  try {
+    const officials = await Official.find({
+      $or: [
+        { firstName: { $regex: value, $options: "i" } },
+        { middleName: { $regex: value, $options: "i" } },
+        { lastName: { $regex: value, $options: "i" } },
+      ],
+    })
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.status(200).json(officials);
+  } catch (err) {
+    res.status(404).json({ error: "Official doesnt exist!" });
+  }
+};
+
 module.exports = {
   getOfficials,
   getOfficialByPosition,
   createOfficial,
   deleteOfficial,
   updateOfficial,
+  searchOfficials,
 };
