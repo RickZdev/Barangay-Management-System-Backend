@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-
+const helperFunction = require("../../helper/getFullName");
 const Resident = require("../models/residentModel");
 const User = require("../models/userModel");
 const Auth = require("../models/authModel");
@@ -59,6 +59,12 @@ const createResident = async (req, res) => {
   // add doc to db
   try {
     const resident = await Resident.create({
+      fullName: helperFunction.getResidentFullName({
+        lastName,
+        firstName,
+        middleName,
+        suffix,
+      }),
       lastName,
       firstName,
       middleName,
@@ -171,10 +177,28 @@ const updateResident = async (req, res) => {
   }
 };
 
+// search user
+const searchResidents = async (req, res) => {
+  const { value } = req.params;
+
+  try {
+    const residents = await Resident.find({
+      $or: [{ fullName: { $regex: value, $options: "i" } }],
+    })
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.status(200).json(residents);
+  } catch (err) {
+    res.status(404).json({ error: "Resident doesnt exist!" });
+  }
+};
+
 module.exports = {
   getResidents,
   getResidentById,
   createResident,
   deleteResident,
   updateResident,
+  searchResidents,
 };

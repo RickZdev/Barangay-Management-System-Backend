@@ -4,6 +4,10 @@ const Schema = mongoose.Schema;
 
 const residentSchema = new Schema(
   {
+    fullName: {
+      type: String,
+      required: true,
+    },
     lastName: {
       type: String,
       required: true,

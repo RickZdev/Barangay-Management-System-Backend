@@ -5,6 +5,7 @@ const {
   createResident,
   deleteResident,
   updateResident,
+  searchResidents,
 } = require("../controllers/residentController");
 
 // const requireAuth = require("../middleware/requireAuth");
@@ -23,5 +24,7 @@ router.post("/", createResident);
 router.delete("/:id", deleteResident);
 
 router.patch("/:id", updateResident);
+
+router.get("/search/:value", searchResidents);
 
 module.exports = router;
