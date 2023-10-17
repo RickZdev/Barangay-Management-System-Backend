@@ -27,13 +27,13 @@ authSchema.statics.login = async function (username, password) {
 
   const user = await this.findOne({ username });
 
-  // if (!user) {
-  //   throw Error("User doesn't exist!");
-  // }
+  if (!user) {
+    throw Error("User doesn't exist!");
+  }
 
   const match = await bcrypt.compare(password, user.password);
 
-  if (user.password !== password) {
+  if (!match) {
     throw Error("Incorrect Password!");
   }
 
@@ -41,30 +41,30 @@ authSchema.statics.login = async function (username, password) {
 };
 
 // static sign up method
-authSchema.statics.signup = async function (residentId, username, password) {
+authSchema.statics.signup = async function (username, password) {
   // validation
-  if (!residentId || !username || !password) {
+  if (!username || !password) {
     throw Error("All fields must be filled");
+  }
+
+  const isUserExists = await this.findOne({ username });
+
+  if (isUserExists) {
+    throw Error("Username already in use!");
   }
 
   if (!validator.isStrongPassword(password)) {
     throw Error("Password is not strong enough!");
   }
 
-  const exists = await this.findOne({ username });
-
-  if (exists) {
-    throw Error("Username already in use!");
-  }
-
   const salt = await bcrypt.genSalt(10);
-  // const hash = await bcrypt.hash(password, salt);
+  const hash = await bcrypt.hash(password, salt);
 
-  const user = await this.create({
-    _id: residentId,
-    username,
-    password: password,
-  });
+  const user = {
+    username: username,
+    // password: password,
+    password: hash,
+  };
 
   return user;
 };

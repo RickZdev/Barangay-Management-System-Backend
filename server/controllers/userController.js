@@ -1,6 +1,25 @@
 const mongoose = require("mongoose");
 const User = require("../models/userModel");
 
+const createUser = async (req, res) => {
+  const { _id, username, residentName } = req.body;
+
+  try {
+    await User.create({
+      _id,
+      username,
+      residentName,
+    });
+
+    res.status(200).json({
+      data: { username: username, residentName: residentName },
+      message: "User created successfully!",
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({}).sort({ createdAt: -1 });
@@ -48,6 +67,7 @@ const updateUser = async (req, res) => {
 };
 
 module.exports = {
+  createUser,
   getAllUsers,
   getUserById,
   updateUser,

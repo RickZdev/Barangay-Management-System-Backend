@@ -1,3 +1,7 @@
+const getCapitalizeWords = (str) => {
+  return str.replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
 const getResidentFullName = ({ lastName, firstName, middleName, suffix }) => {
   let fullName;
   if (middleName && suffix) {
@@ -10,9 +14,10 @@ const getResidentFullName = ({ lastName, firstName, middleName, suffix }) => {
     fullName = `${firstName} ${lastName}`;
   }
 
-  return fullName;
+  return getCapitalizeWords(fullName);
 };
 
 module.exports = {
+  getCapitalizeWords,
   getResidentFullName,
 };

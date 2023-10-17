@@ -13,6 +13,7 @@ const officialSchema = new Schema(
     residentId: {
       type: String,
       required: false,
+      unique: true,
     },
   },
   { timestamps: true, versionKey: false }

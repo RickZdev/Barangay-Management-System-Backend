@@ -58,10 +58,20 @@ const deleteAnnouncement = async (req, res) => {
   }
 
   try {
-    await Announcement.findOneAndDelete({ _id: id });
-    res.status(200).json({ message: "announcement deleted successfully!" });
+    const announcementToDelete = await Announcement.findOne({ _id: id });
+
+    if (announcementToDelete) {
+      await Announcement.findOneAndDelete({ _id: id });
+
+      res.status(200).json({
+        message: "Announcement deleted successfully!",
+        data: announcementToDelete,
+      });
+    } else {
+      return res.status(404).json({ error: "No such announcement" });
+    }
   } catch (error) {
-    res.status(404).json({ error: "No such announcement" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -73,13 +83,31 @@ const updateAnnouncement = async (req, res) => {
   }
 
   try {
-    await Announcement.findOneAndUpdate(
-      { _id: id },
-      {
-        ...req.body,
+    const announcementToUpdate = await Announcement.findOne({ _id: id });
+
+    if (announcementToUpdate) {
+      await Announcement.findOneAndUpdate(
+        { _id: id },
+        {
+          ...req.body,
+        }
+      );
+
+      if (
+        announcementToUpdate?.announcementImage !== req.body.announcementImage
+      ) {
+        res.status(200).json({
+          message: "announcement updated successfully!",
+          data: announcementToUpdate,
+        });
+      } else {
+        res.status(200).json({
+          message: "announcement updated successfully!",
+        });
       }
-    );
-    res.status(200).json({ message: "announcement updated successfully!" });
+    } else {
+      return res.status(404).json({ error: "No such announcement" });
+    }
   } catch (error) {
     res.status(404).json({ error: "No such announcement" });
   }

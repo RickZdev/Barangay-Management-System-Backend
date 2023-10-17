@@ -28,6 +28,7 @@ const getResidentById = async (req, res) => {
 
   try {
     const resident = await Resident.findById(id);
+
     res.status(200).json(resident);
   } catch (error) {
     res.status(404).json({ error: error.message });
@@ -37,6 +38,7 @@ const getResidentById = async (req, res) => {
 // create new user
 const createResident = async (req, res) => {
   const {
+    _id,
     lastName,
     firstName,
     middleName,
@@ -54,24 +56,26 @@ const createResident = async (req, res) => {
     streetAddress,
     purokNumber,
     profileNotes,
+    profilePhoto,
   } = req.body;
 
   // add doc to db
   try {
     const resident = await Resident.create({
+      _id,
       fullName: helperFunction.getResidentFullName({
         lastName,
         firstName,
         middleName,
         suffix,
       }),
-      lastName,
-      firstName,
-      middleName,
+      lastName: helperFunction.getCapitalizeWords(lastName),
+      firstName: helperFunction.getCapitalizeWords(firstName),
+      middleName: helperFunction.getCapitalizeWords(middleName),
       suffix,
       sex,
       emailAddress,
-      contactNumber,
+      contactNumber: contactNumber.toString(),
       birthDate,
       educationalAttainment,
       occupation,
@@ -79,59 +83,26 @@ const createResident = async (req, res) => {
       citizenship,
       category,
       houseNumber,
-      streetAddress,
+      streetAddress: helperFunction.getCapitalizeWords(streetAddress),
       purokNumber,
       profileNotes,
-      profilePhoto: "",
+      profilePhoto,
     });
 
-    // create user account for resident
-    if (resident) {
-      const generateTemporaryCredentials = () => {
-        const characters =
-          "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=";
-        let username = "";
-        for (let i = 0; i < 10; i++) {
-          let randomIndex = Math.floor(Math.random() * characters.length);
-          username += characters[randomIndex];
-        }
-        return username;
-      };
-
-      let temporaryUsername;
-      let temporaryPassword;
-
-      while (true) {
-        temporaryUsername = generateTemporaryCredentials();
-        let exists = await Auth.findOne({ username: temporaryUsername });
-        if (!exists?._id) {
-          break;
-        }
-      }
-
-      while (true) {
-        temporaryPassword = generateTemporaryCredentials();
-        if (validator.isStrongPassword(temporaryPassword)) {
-          break;
-        }
-      }
-
-      if (temporaryUsername && temporaryPassword) {
-        await Auth.signup(resident?._id, temporaryUsername, temporaryPassword);
-        await User.create({
-          _id: resident?._id,
-          residentName: `${resident?.lastName}, ${resident?.firstName} ${resident?.middleName} ${resident?.suffix}`,
-          username: temporaryUsername,
-        });
-
-        res.status(200).json({
-          resident: resident,
-          message: "RESIDENT AND ACCOUNT CREATED SUCCESSFULLY!",
-        });
-      }
-    }
+    res.status(200).json({
+      data: resident,
+      message: "Resident Created Successfully.",
+    });
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    if (
+      error.code === 11000 &&
+      error.keyPattern &&
+      error.keyPattern.emailAddress
+    ) {
+      res.status(400).json({ error: "Email address already in use." });
+    } else {
+      res.status(404).json({ error: error.message });
+    }
   }
 };
 
@@ -144,13 +115,18 @@ const deleteResident = async (req, res) => {
   }
 
   try {
+    const residentToDelete = await Resident.findOne({ _id: id });
+
     await Resident.findOneAndDelete({ _id: id });
     await User.findOneAndDelete({ _id: id });
     await Auth.findOneAndDelete({ _id: id });
     await Admin.findOneAndDelete({ _id: id });
     await Official.findOneAndDelete({ _id: id });
 
-    res.status(200).json({ message: "resident deleted successfully!" });
+    res.status(200).json({
+      message: "resident deleted successfully!",
+      data: residentToDelete,
+    });
   } catch (error) {
     res.status(404).json({ error: "No such resident" });
   }
@@ -165,15 +141,37 @@ const updateResident = async (req, res) => {
   }
 
   try {
-    await Resident.findOneAndUpdate(
-      { _id: id },
-      {
-        ...req.body,
+    const residentToUpdate = await Resident.findOne({ _id: id });
+
+    if (residentToUpdate) {
+      await Resident.findOneAndUpdate({ _id: id }, { ...req.body });
+
+      if (residentToUpdate?.profilePhoto !== req.body.profilePhoto) {
+        res.status(200).json({
+          message: "Resident Updated Successfully.",
+          data: residentToUpdate,
+        });
+      } else {
+        res.status(200).json({
+          message: "Resident Updated Successfully.",
+        });
       }
-    );
-    res.status(200).json({ message: "user updated successfully!" });
+    } else {
+      return res.status(404).json({ error: "No such resident" });
+    }
   } catch (error) {
-    res.status(404).json({ error: "No such user" });
+    if (
+      error.code === 11000 &&
+      error.keyPattern &&
+      error.keyPattern.emailAddress
+    ) {
+      res.status(400).json({
+        error: "Email address already in use.",
+        message: error.message,
+      });
+    } else {
+      res.status(404).json({ error: "No such user", message: error.message });
+    }
   }
 };
 

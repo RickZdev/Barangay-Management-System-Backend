@@ -34,9 +34,8 @@ const residentSchema = new Schema(
       unique: true,
     },
     contactNumber: {
-      type: Number,
+      type: String,
       required: true,
-      unique: true,
     },
     birthDate: {
       type: String,

@@ -1,5 +1,6 @@
 const express = require("express");
 const {
+  createUser,
   getAllUsers,
   getUserById,
   updateUser,
@@ -11,6 +12,8 @@ const router = express.Router();
 
 // require auth for all users request routes
 // router.use(requireAuth);
+
+router.post("/", createUser);
 
 router.get("/", getAllUsers);
 

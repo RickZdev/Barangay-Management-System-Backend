@@ -1,10 +1,13 @@
+const mongoose = require("mongoose");
 const Auth = require("../models/authModel");
-const User = require("../models/userModel");
 const Admin = require("../models/adminModel");
 const LoginAuditModel = require("../models/loginAuditModel");
 
 // json token
 const jwt = require("jsonwebtoken");
+
+// Token expires in 10 seconds
+// decide if you refresh token or just session token
 const createToken = (_id) => {
   return jwt.sign({ _id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 };
@@ -18,7 +21,7 @@ const loginUser = async (req, res) => {
     const user = await Auth.login(username, password);
     const admin = await Admin.findOne({ _id: user._id });
 
-    if (admin._id) {
+    if (admin) {
       const timeAndDate =
         new Date().toLocaleDateString() +
         " - " +
@@ -40,6 +43,12 @@ const loginUser = async (req, res) => {
         .json({ _id: user._id, username, token, userRole: userRole });
     } else {
       userRole = "Resident";
+
+      const token = createToken(user?._id);
+
+      res
+        .status(200)
+        .json({ _id: user._id, username, token, userRole: userRole });
     }
 
     // produce access token
@@ -50,18 +59,21 @@ const loginUser = async (req, res) => {
 
 // signup user
 const signupUser = async (req, res) => {
-  const { residentId, username, password } = req.body;
+  const { username, password } = req.body;
 
   try {
-    const user = await Auth.signup(residentId, username, password);
+    const auth = await Auth.signup(username, password);
 
-    if (user) {
-      await User.create({
-        _id: residentId,
+    if (auth) {
+      const user = await Auth.create({
         username: username,
+        password: auth?.password,
       });
 
-      res.status(200).json({ username, message: "Register successfully!" });
+      res.status(200).json({
+        data: { _id: user?._id, username: username },
+        message: "Register successfully!",
+      });
     } else {
       res.status(400).json({ error: "Error creating an account!" });
     }
@@ -70,7 +82,23 @@ const signupUser = async (req, res) => {
   }
 };
 
+const deleteUser = async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ error: "Not a valid user id" });
+  }
+
+  try {
+    await Auth.findOneAndDelete({ _id: id });
+    res.status(200).json({ message: "user deleted successfully!" });
+  } catch (error) {
+    res.status(404).json({ error: "No such user" });
+  }
+};
+
 module.exports = {
   loginUser,
   signupUser,
+  deleteUser,
 };

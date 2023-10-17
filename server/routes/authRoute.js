@@ -1,6 +1,10 @@
 const express = require("express");
 
-const { loginUser, signupUser } = require("../controllers/authController");
+const {
+  loginUser,
+  signupUser,
+  deleteUser,
+} = require("../controllers/authController");
 
 const router = express.Router();
 
@@ -9,5 +13,8 @@ router.post("/login", loginUser);
 
 // signup route
 router.post("/signup", signupUser);
+
+// delete user route
+router.delete("/:id", deleteUser);
 
 module.exports = router;
