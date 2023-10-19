@@ -6,9 +6,17 @@ const blotterSchema = new Schema(
   {
     complainantId: {
       type: String,
-      required: true,
+      required: false,
     },
     complainantName: {
+      type: String,
+      required: false,
+    },
+    complainantType: {
+      type: String,
+      required: false,
+    },
+    complainantAddress: {
       type: String,
       required: false,
     },

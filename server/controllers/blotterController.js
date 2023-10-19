@@ -31,6 +31,8 @@ const createBlotter = async (req, res) => {
   const {
     complainantId,
     complainantName,
+    complainantType,
+    complainantAddress,
     incidentType,
     incidentLocation,
     respondentId,
@@ -47,6 +49,8 @@ const createBlotter = async (req, res) => {
     const blotter = await Blotter.create({
       complainantId,
       complainantName,
+      complainantType,
+      complainantAddress,
       incidentType,
       incidentLocation,
       respondentId,
