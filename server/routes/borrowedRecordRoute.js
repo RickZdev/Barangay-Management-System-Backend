@@ -2,6 +2,7 @@ const express = require("express");
 const {
   getBorrowedRecords,
   createBorrowedRecord,
+  deleteBorrowedRecord,
 } = require("../controllers/borrowedRecordController");
 
 // const requireAuth = require("../middleware/requireAuth");
@@ -14,5 +15,7 @@ const router = express.Router();
 router.get("/", getBorrowedRecords);
 
 router.post("/", createBorrowedRecord);
+
+router.delete("/:id", deleteBorrowedRecord);
 
 module.exports = router;

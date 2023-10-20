@@ -42,7 +42,22 @@ const createBorrowedRecord = async (req, res) => {
   }
 };
 
+const deleteBorrowedRecord = async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ error: "Not a valid borrowedRecord id" });
+  }
+  try {
+    await BorrowedRecord.findOneAndDelete({ _id: id });
+    res.status(200).json({ message: "borrowedRecord deleted successfully!" });
+  } catch (error) {
+    res.status(404).json({ error: "No such borrowedRecord" });
+  }
+};
+
 module.exports = {
   getBorrowedRecords,
   createBorrowedRecord,
+  deleteBorrowedRecord,
 };

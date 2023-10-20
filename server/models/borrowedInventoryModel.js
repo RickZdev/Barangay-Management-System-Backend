@@ -15,7 +15,7 @@ const borrowedInventorySchema = new Schema(
       required: true,
     },
     borroweeContactNumber: {
-      type: Number,
+      type: String,
       required: true,
     },
     borrowedDateAndTime: {

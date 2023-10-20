@@ -25,8 +25,15 @@ const app = express();
 
 // middleware
 app.use(express.json());
-// app.use(cors({ origin: "http://localhost:3000", optionsSuccessStatus: 200 }));
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      `http://localhost:${process.env.PORT}`,
+      "https://navotas-east-api.com",
+    ],
+  })
+);
+// app.use(cors());
 app.use((req, res, next) => {
   console.log(req.method, req.path);
   next();
