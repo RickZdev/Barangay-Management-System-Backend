@@ -28,6 +28,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: [
+      `http://localhost:${process.env.VITE_PORT}`,
       `http://localhost:${process.env.PORT}`,
       "https://navotas-east-api.com",
     ],
