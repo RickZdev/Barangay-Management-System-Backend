@@ -30,7 +30,7 @@ app.use(
     origin: [
       `http://localhost:${process.env.VITE_PORT}`,
       `http://localhost:${process.env.PORT}`,
-      "https://navotas-east-api.com",
+      "https://navotas-east.onrender.com",
     ],
   })
 );
