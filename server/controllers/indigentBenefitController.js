@@ -39,6 +39,7 @@ const createIndigentBenefit = async (req, res) => {
     status,
     receiver,
     relation,
+    birthDate,
     monthAndYear,
   } = req.body;
 
@@ -52,6 +53,7 @@ const createIndigentBenefit = async (req, res) => {
       status,
       receiver,
       relation,
+      birthDate,
       monthAndYear,
     });
 
