@@ -38,6 +38,10 @@ const indigentBenefitSchema = new Schema(
       type: String,
       required: false,
     },
+    birthDate: {
+      type: String,
+      required: true,
+    },
     monthAndYear: {
       type: String,
       required: false,
