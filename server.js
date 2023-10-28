@@ -31,6 +31,7 @@ app.use(
       `http://localhost:${process.env.VITE_PORT}`,
       `http://localhost:${process.env.PORT}`,
       "https://navotas-east.onrender.com",
+      "http://127.0.0.1:5173",
     ],
   })
 );

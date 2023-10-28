@@ -9,7 +9,7 @@ const jwt = require("jsonwebtoken");
 // Token expires in 10 seconds
 // decide if you refresh token or just session token
 const createToken = (_id) => {
-  return jwt.sign({ _id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+  return jwt.sign({ _id }, process.env.JWT_SECRET, { expiresIn: "365d" });
 };
 
 // login user
