@@ -124,7 +124,7 @@ const forgotPassword = async (req, res) => {
       { expiresIn: "15m" }
     );
 
-    const forgotPasswordLink = `http://localhost:5173/portal/reset-password?id=${auth?._id}&token=${token}`;
+    const forgotPasswordLink = `${process.env.CLIENT_PRODUCTION_ROUTE}/portal/reset-password?id=${auth?._id}&token=${token}`;
 
     // mail the link to email address
     helper.nodeMailer(emailAddress, user?.fullName, forgotPasswordLink);
