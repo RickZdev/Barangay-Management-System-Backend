@@ -6,9 +6,11 @@ const {
   deleteResident,
   updateResident,
   searchResidents,
+  getStatusResidents,
+  deleteStatusResident,
 } = require("../controllers/residentController");
 
-const requireAuth = require("../middleware/requireAuth");
+// const requireAuth = require("../middleware/requireAuth");
 
 const router = express.Router();
 
@@ -26,5 +28,9 @@ router.delete("/:id", deleteResident);
 router.patch("/:id", updateResident);
 
 router.get("/search/:value", searchResidents);
+
+router.get("/status/resident", getStatusResidents);
+
+router.delete("/status/resident/:id", deleteStatusResident);
 
 module.exports = router;

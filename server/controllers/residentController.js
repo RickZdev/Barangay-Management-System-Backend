@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
-const validator = require("validator");
 const helperFunction = require("../../helper/getFullName");
 const Resident = require("../models/residentModel");
+const ResidentStatus = require("../models/residentStatusModel");
 const User = require("../models/userModel");
 const Auth = require("../models/authModel");
 const Admin = require("../models/adminModel");
@@ -89,6 +89,11 @@ const createResident = async (req, res) => {
       profilePhoto,
     });
 
+    await ResidentStatus.create({
+      _id,
+      residentName: resident.fullName,
+    });
+
     res.status(200).json({
       data: resident,
       message: "Resident Created Successfully.",
@@ -118,6 +123,7 @@ const deleteResident = async (req, res) => {
     const residentToDelete = await Resident.findOne({ _id: id });
 
     await Resident.findOneAndDelete({ _id: id });
+    await ResidentStatus.findOneAndDelete({ _id: id });
     await User.findOneAndDelete({ _id: id });
     await Auth.findOneAndDelete({ _id: id });
     await Admin.findOneAndDelete({ _id: id });
@@ -192,6 +198,38 @@ const searchResidents = async (req, res) => {
   }
 };
 
+// statuses of user
+const getStatusResidents = async (req, res) => {
+  try {
+    const residents = await ResidentStatus.find({}).sort({ createdAt: -1 });
+
+    res.status(200).json(residents);
+  } catch (err) {
+    res.status(404).json({ error: "Residents doesnt exist!" });
+  }
+};
+
+const deleteStatusResident = async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ error: "Not a valid resident" });
+  }
+
+  try {
+    const residentStatusToDelete = await ResidentStatus.findOneAndDelete({
+      _id: id,
+    });
+
+    res.status(200).json({
+      message: "resident status deleted successfully!",
+      data: residentStatusToDelete,
+    });
+  } catch (error) {
+    res.status(404).json({ error: "No such resident" });
+  }
+};
+
 module.exports = {
   getResidents,
   getResidentById,
@@ -199,4 +237,6 @@ module.exports = {
   deleteResident,
   updateResident,
   searchResidents,
+  getStatusResidents,
+  deleteStatusResident,
 };
