@@ -7,6 +7,9 @@ const Auth = require("../models/authModel");
 const Admin = require("../models/adminModel");
 const Official = require("../models/officialModel");
 
+// nodemailer
+const mail = require("../../helper/nodeMailerService");
+
 // get all residents
 const getResidents = async (req, res) => {
   try {
@@ -94,6 +97,9 @@ const createResident = async (req, res) => {
       residentName: resident.fullName,
     });
 
+    // mailer
+    mail.accountProcessingMailer(resident?.emailAddress, resident?.fullName);
+
     res.status(200).json({
       data: resident,
       message: "Resident Created Successfully.",
@@ -123,7 +129,6 @@ const deleteResident = async (req, res) => {
     const residentToDelete = await Resident.findOne({ _id: id });
 
     await Resident.findOneAndDelete({ _id: id });
-    await ResidentStatus.findOneAndDelete({ _id: id });
     await User.findOneAndDelete({ _id: id });
     await Auth.findOneAndDelete({ _id: id });
     await Admin.findOneAndDelete({ _id: id });
@@ -211,15 +216,30 @@ const getStatusResidents = async (req, res) => {
 
 const deleteStatusResident = async (req, res) => {
   const { id } = req.params;
+  const { status } = req.query;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(404).json({ error: "Not a valid resident" });
   }
 
   try {
+    const resident = await Resident.findById(id);
+
     const residentStatusToDelete = await ResidentStatus.findOneAndDelete({
       _id: id,
     });
+
+    // mail the instruction to email address
+    if (status === "Approved") {
+      const mainWebsiteLink = process.env.CLIENT_PRODUCTION_ROUTE;
+      mail.accountVerifiedMailer(
+        resident?.emailAddress,
+        resident?.fullName,
+        mainWebsiteLink
+      );
+    } else if (status === "Rejected") {
+      mail.accountRejectedMailer(resident?.emailAddress, resident?.fullName);
+    }
 
     res.status(200).json({
       message: "resident status deleted successfully!",
