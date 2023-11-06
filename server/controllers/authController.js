@@ -10,7 +10,7 @@ const validator = require("validator");
 const jwt = require("jsonwebtoken");
 
 // nodemailer
-const helper = require("../../helper/nodeMailerService");
+const mail = require("../../helper/nodeMailerService");
 
 // Token expires in 10 seconds
 // decide if you refresh token or just session token
@@ -127,7 +127,7 @@ const forgotPassword = async (req, res) => {
     const forgotPasswordLink = `${process.env.CLIENT_PRODUCTION_ROUTE}/portal/reset-password?id=${auth?._id}&token=${token}`;
 
     // mail the link to email address
-    helper.nodeMailer(emailAddress, user?.fullName, forgotPasswordLink);
+    mail.changePasswordMailer(emailAddress, user?.fullName, forgotPasswordLink);
 
     res.status(200).json({
       message: "Reset password link sent to email address successfully",

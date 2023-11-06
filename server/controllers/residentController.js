@@ -1,11 +1,14 @@
 const mongoose = require("mongoose");
-const validator = require("validator");
 const helperFunction = require("../../helper/getFullName");
 const Resident = require("../models/residentModel");
+const ResidentStatus = require("../models/residentStatusModel");
 const User = require("../models/userModel");
 const Auth = require("../models/authModel");
 const Admin = require("../models/adminModel");
 const Official = require("../models/officialModel");
+
+// nodemailer
+const mail = require("../../helper/nodeMailerService");
 
 // get all residents
 const getResidents = async (req, res) => {
@@ -88,6 +91,14 @@ const createResident = async (req, res) => {
       profileNotes,
       profilePhoto,
     });
+
+    await ResidentStatus.create({
+      _id,
+      residentName: resident.fullName,
+    });
+
+    // mailer
+    mail.accountProcessingMailer(resident?.emailAddress, resident?.fullName);
 
     res.status(200).json({
       data: resident,
@@ -192,6 +203,53 @@ const searchResidents = async (req, res) => {
   }
 };
 
+// statuses of user
+const getStatusResidents = async (req, res) => {
+  try {
+    const residents = await ResidentStatus.find({}).sort({ createdAt: -1 });
+
+    res.status(200).json(residents);
+  } catch (err) {
+    res.status(404).json({ error: "Residents doesnt exist!" });
+  }
+};
+
+const deleteStatusResident = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.query;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ error: "Not a valid resident" });
+  }
+
+  try {
+    const resident = await Resident.findById(id);
+
+    const residentStatusToDelete = await ResidentStatus.findOneAndDelete({
+      _id: id,
+    });
+
+    // mail the instruction to email address
+    if (status === "Approved") {
+      const mainWebsiteLink = process.env.CLIENT_PRODUCTION_ROUTE;
+      mail.accountVerifiedMailer(
+        resident?.emailAddress,
+        resident?.fullName,
+        mainWebsiteLink
+      );
+    } else if (status === "Rejected") {
+      mail.accountRejectedMailer(resident?.emailAddress, resident?.fullName);
+    }
+
+    res.status(200).json({
+      message: "resident status deleted successfully!",
+      data: residentStatusToDelete,
+    });
+  } catch (error) {
+    res.status(404).json({ error: "No such resident" });
+  }
+};
+
 module.exports = {
   getResidents,
   getResidentById,
@@ -199,4 +257,6 @@ module.exports = {
   deleteResident,
   updateResident,
   searchResidents,
+  getStatusResidents,
+  deleteStatusResident,
 };
