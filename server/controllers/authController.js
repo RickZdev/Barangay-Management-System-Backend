@@ -165,7 +165,7 @@ const resetPassword = async (req, res) => {
 };
 
 const changePassword = async (req, res) => {
-  const { id, newPassword } = req.body;
+  const { id, currentPassword, newPassword } = req.body;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(404).json({ error: "Not a valid user id" });
@@ -177,6 +177,14 @@ const changePassword = async (req, res) => {
 
   try {
     const auth = await Auth.findById(id);
+
+    if (currentPassword) {
+      const match = await bcrypt.compare(currentPassword, auth.password);
+
+      if (!match) {
+        throw Error("Incorrect Password");
+      }
+    }
 
     if (!auth) {
       res.status(404).json({ error: "No such user" });
@@ -196,7 +204,7 @@ const changePassword = async (req, res) => {
       message: "Changed Password Successfully",
     });
   } catch (error) {
-    res.status(404).json({ error: "No such user" });
+    res.status(404).json({ error: "Incorrect Password" });
   }
 };
 module.exports = {
