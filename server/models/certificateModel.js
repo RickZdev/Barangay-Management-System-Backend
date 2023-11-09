@@ -28,6 +28,10 @@ const certificatesSchema = new Schema(
       type: Object,
       required: false,
     },
+    status: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: false, versionKey: false }
 );
