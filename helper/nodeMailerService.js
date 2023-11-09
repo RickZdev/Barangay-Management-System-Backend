@@ -137,9 +137,118 @@ const accountRejectedMailer = (email, name) => {
   });
 };
 
+const certificateProcessingMailer = (email, name) => {
+  var transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.NODEMAILER_EMAIL,
+      pass: process.env.NODEMAILER_PASS,
+    },
+  });
+
+  var mailOptions = {
+    from: {
+      name: "Barangay Navotas East",
+      address: process.env.NODEMAILER_EMAIL,
+    },
+    to: [email],
+    subject:
+      "Barangay Navotas East Management System - Certification Request in Progress",
+    text: `Dear ${name}, 
+          \nWe hope this email finds you well. We would like to inform you that we have received your request for certification through Barangay Navotas East Management System. Your request is currently in process, and we are diligently verifying all the details provided to ensure accuracy and legitimacy.
+          \nOur team is dedicated to processing your request promptly, and you can expect to receive an update on the status of your request within 1 to 3 business days. We kindly ask for your patience and understanding during this processing period.
+          \nPlease note that upon approval of your certification request, there will be a fee associated with the certificate (if applicable).
+          \nWe appreciate your cooperation in providing accurate information, which enables us to expedite the verification process effectively. Rest assured, your request is important to us, and we are committed to providing you with a seamless experience.
+          \nWe understand the importance of a smooth and secure certification process, and we appreciate your patience and cooperation during this verification period. If you have any questions or concerns, please do not hesitate to contact our support team at ${process.env.NODEMAILER_EMAIL}.
+          \nThank you for your understanding and cooperation. We look forward to serving you.
+          \nBest regards, \nBarangay Management Team`,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
+};
+
+const certificateApprovedMailer = (email, name) => {
+  var transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.NODEMAILER_EMAIL,
+      pass: process.env.NODEMAILER_PASS,
+    },
+  });
+
+  var mailOptions = {
+    from: {
+      name: "Barangay Navotas East",
+      address: process.env.NODEMAILER_EMAIL,
+    },
+    to: [email],
+    subject:
+      "Barangay Navotas East Management System - Certification Request Approved",
+    text: `Dear ${name}, 
+          \nWe are pleased to inform you that your certification request submitted through Barangay Navotas East Management System has been successfully processed and approved.
+          \nYour certification is now ready for pickup at the Barangay Office. Our office hours are from 9:00 AM to 5:00 PM, Monday to Friday. Please feel free to visit us at your earliest convenience to collect your approved certification.
+          \nKindly ensure that you bring a valid identification document with you when picking up your certification. This will help us verify your identity and facilitate a smooth handover process.
+          \nIf you have any questions or concerns, please do not hesitate to contact our support team at ${process.env.NODEMAILER_EMAIL}.
+          \nThank you for choosing Barangay Navotas East Management System. We look forward to serving you and enhancing your community interactions through our platform.
+          \nBest regards, \nBarangay Management Team`,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
+};
+
+const certificateRejectedMailer = (email, name) => {
+  var transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.NODEMAILER_EMAIL,
+      pass: process.env.NODEMAILER_PASS,
+    },
+  });
+
+  var mailOptions = {
+    from: {
+      name: "Barangay Navotas East",
+      address: process.env.NODEMAILER_EMAIL,
+    },
+    to: [email],
+    subject:
+      "Barangay Navotas East Management System - Certification Request Rejected",
+    text: `Dear ${name}, 
+          \nWe hope this email finds you well. We regret to inform you that your certification request submitted through Barangay Navotas East Management System has been rejected due to unconfirmed details. Our verification process revealed discrepancies that prevent us from approving your request at this time.
+          \nWe understand that this news might be disappointing, and we sincerely apologize for any inconvenience caused. To address the issue and resubmit your request, we kindly ask you to review the information provided during the application process.
+          \nIf you have any questions or require further clarification regarding the rejection reasons, please do not hesitate to reply to this email or visit our office during our operating hours. Our team will be happy to assist you in resolving any concerns you may have.
+          \nOur office hours are from 9:00 AM to 5:00 PM, Monday to Friday. You can find us at Barangay Office. Alternatively, you may contact our support team at ${process.env.NODEMAILER_EMAIL} for additional assistance.
+          \nThank you for your understanding and cooperation. We appreciate your interest in obtaining certification through Barangay Navotas East Management System, and we look forward to assisting you further once the necessary details have been confirmed.
+          \nBest regards, \nBarangay Management Team`,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
+};
+
 module.exports = {
   changePasswordMailer,
   accountProcessingMailer,
   accountVerifiedMailer,
   accountRejectedMailer,
+  certificateProcessingMailer,
+  certificateApprovedMailer,
+  certificateRejectedMailer,
 };
