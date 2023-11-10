@@ -20,6 +20,7 @@ const blotterRoute = require("./server/routes/blotterRoute");
 const sulatReklamoRoute = require("./server/routes/sulatReklamoRoute");
 const indigentBenefitRoute = require("./server/routes/indigentBenefitRoute");
 const certificateRoute = require("./server/routes/certificateRoute");
+const inventoryRoute = require("./server/routes/inventoryRoute");
 
 // express app
 const app = express();
@@ -58,6 +59,7 @@ app.use("/api/blotters", blotterRoute);
 app.use("/api/sulatreklamo", sulatReklamoRoute);
 app.use("/api/indigentbenefits", indigentBenefitRoute);
 app.use("/api/certificates", certificateRoute);
+app.use("/api/inventories", inventoryRoute);
 
 // connect to db/mongoose
 mongoose
