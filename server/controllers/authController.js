@@ -121,7 +121,7 @@ const forgotPassword = async (req, res) => {
     const token = jwt.sign(
       { emailAddress: emailAddress, id: auth?._id },
       secret,
-      { expiresIn: "1m" }
+      { expiresIn: "15m" }
     );
 
     const forgotPasswordLink = `${process.env.CLIENT_PRODUCTION_ROUTE}/portal/reset-password?id=${auth?._id}&token=${token}`;
